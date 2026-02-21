@@ -8,6 +8,7 @@ export default function Home() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const liveVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const startRecording = useCallback(async () => {
     try {
@@ -46,6 +47,11 @@ export default function Home() {
       mediaRecorderRef.current = mediaRecorder;
       setRecording(true);
       setVideoUrl(null);
+
+      // Show live preview
+      if (liveVideoRef.current) {
+        liveVideoRef.current.srcObject = stream;
+      }
     } catch (err) {
       console.error("Failed to start screen recording:", err);
     }
@@ -55,6 +61,9 @@ export default function Home() {
     if (mediaRecorderRef.current && recording) {
       mediaRecorderRef.current.stop();
       streamRef.current?.getTracks().forEach((track) => track.stop());
+      if (liveVideoRef.current) {
+        liveVideoRef.current.srcObject = null;
+      }
     }
   }, [recording]);
 
@@ -88,6 +97,19 @@ export default function Home() {
             </span>
           )}
         </div>
+
+        {/* Live Preview */}
+        {recording && (
+          <div className="space-y-3">
+            <h2 className="text-lg font-medium">Live Preview</h2>
+            <video
+              ref={liveVideoRef}
+              autoPlay
+              muted
+              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
+            />
+          </div>
+        )}
 
         {/* Interactive Area — something to click around */}
         <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
