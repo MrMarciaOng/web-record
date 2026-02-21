@@ -5,12 +5,24 @@ import { useRef, useState, useCallback } from "react";
 export default function Home() {
   const [recording, setRecording] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [showMobileWarning, setShowMobileWarning] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const liveVideoRef = useRef<HTMLVideoElement | null>(null);
 
+  const isMobile = useCallback(() => {
+    return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  }, []);
+
   const startRecording = useCallback(async () => {
+    if (isMobile()) {
+      setShowMobileWarning(true);
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
@@ -60,7 +72,7 @@ export default function Home() {
     } catch (err) {
       console.error("Failed to start screen recording:", err);
     }
-  }, []);
+  }, [isMobile]);
 
   const stopRecording = useCallback(() => {
     if (
@@ -160,6 +172,26 @@ export default function Home() {
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download Recording
             </a>
+          </div>
+        )}
+        {/* Mobile Warning Popup */}
+        {showMobileWarning && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="mx-4 w-full max-w-sm rounded-xl bg-white dark:bg-zinc-900 p-6 shadow-xl space-y-4 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600 dark:text-red-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <h3 className="text-lg font-semibold">Not Supported</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Screen recording is not supported on mobile browsers. Please use a desktop browser to record your screen.
+              </p>
+              <button
+                onClick={() => setShowMobileWarning(false)}
+                className="w-full rounded-md bg-zinc-900 dark:bg-zinc-100 px-4 py-2 text-sm font-medium text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+              >
+                Got it
+              </button>
+            </div>
           </div>
         )}
       </div>
