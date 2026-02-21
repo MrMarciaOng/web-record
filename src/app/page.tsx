@@ -35,12 +35,17 @@ export default function Home() {
         const url = URL.createObjectURL(blob);
         setVideoUrl(url);
         setRecording(false);
+
+        // Clean up tracks
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
       };
 
       // Stop recording if the user ends screen share via browser UI
       stream.getVideoTracks()[0].addEventListener("ended", () => {
-        mediaRecorder.stop();
-        setRecording(false);
+        if (mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
       });
 
       mediaRecorder.start();
@@ -58,14 +63,16 @@ export default function Home() {
   }, []);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && recording) {
-      mediaRecorderRef.current.stop();
-      streamRef.current?.getTracks().forEach((track) => track.stop());
+    if (
+      mediaRecorderRef.current &&
+      mediaRecorderRef.current.state !== "inactive"
+    ) {
+      mediaRecorderRef.current.stop(); // triggers onstop which cleans up tracks
       if (liveVideoRef.current) {
         liveVideoRef.current.srcObject = null;
       }
     }
-  }, [recording]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-8">
@@ -136,9 +143,9 @@ export default function Home() {
           </label>
         </div>
 
-        {/* Video Playback */}
+        {/* Video Playback & Download */}
         {videoUrl && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <h2 className="text-lg font-medium">Recorded Video</h2>
             <video
               src={videoUrl}
@@ -148,8 +155,9 @@ export default function Home() {
             <a
               href={videoUrl}
               download="screen-recording.webm"
-              className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
             >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download Recording
             </a>
           </div>
