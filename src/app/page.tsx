@@ -118,17 +118,16 @@ export default function Home() {
         </div>
 
         {/* Live Preview */}
-        {recording && (
-          <div className="space-y-3">
-            <h2 className="text-lg font-medium">Live Preview</h2>
-            <video
-              ref={liveVideoRef}
-              autoPlay
-              muted
-              className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
-            />
-          </div>
-        )}
+        <div className={recording ? "space-y-3" : "hidden"}>
+          <h2 className="text-lg font-medium">Live Preview</h2>
+          <video
+            ref={liveVideoRef}
+            autoPlay
+            muted
+            playsInline
+            className="w-full rounded-lg border border-zinc-200 dark:border-zinc-800"
+          />
+        </div>
 
         {/* Interactive Area — something to click around */}
         <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
