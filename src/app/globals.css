@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7fbff;
+  --foreground: #0c1b33;
+  --muted: #5e7398;
+  --card: rgba(255, 255, 255, 0.92);
+  --card-border: rgba(55, 109, 219, 0.18);
+  --accent: #0ea5e9;
+  --accent-strong: #0369a1;
+  --accent-warm: #f97316;
 }
 
 @theme inline {
@@ -10,15 +16,16 @@
   --color-foreground: var(--foreground);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--card-border);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 640px at -10% -20%, rgba(59, 130, 246, 0.24), transparent 65%),
+    radial-gradient(920px 580px at 105% -10%, rgba(251, 146, 60, 0.2), transparent 60%),
+    linear-gradient(165deg, #f7fbff 0%, #edf6ff 52%, #fef7ef 100%);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: "Sora", "Avenir Next", "Segoe UI", sans-serif;
 }
